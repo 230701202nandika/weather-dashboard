@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="A premium, responsive client-side weather dashboard utilizing Open-Meteo APIs and Chart.js.">
+  <title>Weather Dashboard</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-sunny">
+
+  <div class="dashboard-wrapper">
+    <main class="dashboard-container">
+      
+      <!-- Header Section -->
+      <header class="dashboard-header">
+        <h1 class="logo-title"><i class="fa-solid fa-cloud-sun"></i> Weather Dashboard</h1>
+        
+        <div class="controls-bar">
+          <!-- Search Form -->
+          <form id="search-form" class="search-form" novalidate>
+            <div class="search-input-wrapper">
+              <i class="fa-solid fa-magnifying-glass search-icon"></i>
+              <input 
+                type="text" 
+                id="city-input" 
+                placeholder="Search city..." 
+                required 
+                aria-label="Search city name"
+              >
+            </div>
+            <button type="submit" id="search-btn" class="btn btn-primary" aria-label="Search">
+              Search
+            </button>
+          </form>
+
+          <!-- Utilities -->
+          <div class="utility-buttons">
+            <button 
+              type="button" 
+              id="geo-btn" 
+              class="btn btn-secondary btn-icon" 
+              title="Detect Current Location"
+              aria-label="Detect current location"
+            >
+              <i class="fa-solid fa-location-crosshairs"></i>
+            </button>
+            
+            <div class="unit-toggle-group" role="group" aria-label="Temperature unit selector">
+              <button type="button" id="unit-c" class="unit-btn active" aria-pressed="true">°C</button>
+              <button type="button" id="unit-f" class="unit-btn" aria-pressed="false">°F</button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Error Alert Message -->
+      <section id="error-alert" class="error-alert-box hidden" role="alert" aria-live="assertive">
+        <div class="error-content">
+          <i class="fa-solid fa-circle-exclamation error-icon"></i>
+          <span id="error-message">City not found. Please try again.</span>
+        </div>
+        <button type="button" id="close-error-btn" class="close-error-btn" aria-label="Close error message">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </section>
+
+      <!-- Loading Spinner Section -->
+      <section id="loading-state" class="loading-state hidden" aria-busy="true" aria-label="Loading weather data">
+        <div class="spinner-container">
+          <div class="loading-spinner"></div>
+          <p class="loading-text">Fetching current weather forecasts...</p>
+        </div>
+      </section>
+
+      <!-- Main Weather Dashboard Content -->
+      <div id="weather-content" class="weather-content hidden">
+        
+        <!-- Current Weather Card -->
+        <section class="current-weather-section" aria-labelledby="current-weather-title">
+          <h2 id="current-weather-title" class="sr-only">Current Weather Details</h2>
+          
+          <div class="glass-card current-weather-card">
+            
+            <div class="current-main">
+              <div class="location-datetime">
+                <h3 id="current-city-country" class="location-name">Chennai, IN</h3>
+                <p id="current-local-time" class="local-date-time">Thursday, 08:44 AM</p>
+              </div>
+              
+              <div class="temp-condition-wrapper">
+                <div class="temp-display">
+                  <span id="current-temp" class="temp-value">34</span><span id="temp-unit-symbol" class="temp-unit-symbol">°C</span>
+                </div>
+                <div class="condition-display">
+                  <div id="current-weather-icon" class="weather-emoji" aria-hidden="true">☀️</div>
+                  <div class="condition-meta">
+                    <span id="current-condition-text" class="condition-text">Clear Sky</span>
+                    <span id="current-feels-like" class="feels-like-text">Feels like 38°C</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="current-details-grid">
+              <div class="detail-item">
+                <div class="detail-icon" aria-hidden="true">
+                  <i class="fa-solid fa-droplet"></i>
+                </div>
+                <div class="detail-info">
+                  <span class="detail-label">Humidity</span>
+                  <span id="current-humidity" class="detail-value">72%</span>
+                </div>
+              </div>
+              
+              <div class="detail-item">
+                <div class="detail-icon" aria-hidden="true">
+                  <i class="fa-solid fa-wind"></i>
+                </div>
+                <div class="detail-info">
+                  <span class="detail-label">Wind Speed</span>
+                  <span id="current-windspeed" class="detail-value">18 km/h</span>
+                </div>
+              </div>
+              
+              <div class="detail-item">
+                <div class="detail-icon" aria-hidden="true">
+                  <i class="fa-solid fa-eye"></i>
+                </div>
+                <div class="detail-info">
+                  <span class="detail-label">Visibility</span>
+                  <span id="current-visibility" class="detail-value">8 km</span>
+                </div>
+              </div>
+            </div>
+            
+          </div>
+        </section>
+
+        <!-- 5-Day Forecast Section -->
+        <section class="forecast-section" aria-labelledby="forecast-section-title">
+          <h2 id="forecast-section-title" class="section-title">5-Day Forecast</h2>
+          <div id="forecast-container" class="forecast-cards-container">
+            <!-- Dynamically populated 5-day forecast cards -->
+          </div>
+        </section>
+
+        <!-- Hourly Temperature Chart Section -->
+        <section class="chart-section" aria-labelledby="chart-section-title">
+          <h2 id="chart-section-title" class="section-title">Hourly Temperature Trend</h2>
+          <div class="glass-card chart-card">
+            <div class="chart-wrapper">
+              <canvas id="hourly-chart"></canvas>
+            </div>
+          </div>
+        </section>
+
+      </div>
+      
+    </main>
+  </div>
+
+  <!-- Main JavaScript File -->
+  <script src="script.js"></script>
+</body>
+</html>
