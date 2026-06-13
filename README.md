@@ -102,10 +102,20 @@ No API key required.
 
 5. Search for any city to view weather information.
 
----
+
 
 ## Screenshots
 
-(Add screenshots of the application here before submission.)
+### Current Weather
+
+![Current Weather](weather.png)
+
+### 5-Day Forecast
+
+![Forecast](forecast.png)
+
+### Hourly Temperature Chart
+
+![Chart](chart.png)
 
 
